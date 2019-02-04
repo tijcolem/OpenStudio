@@ -3,9 +3,11 @@ node("openstudio-ubuntu-1604") {
      dir("/srv/data/OpenStudio/build")  {
       sh("printenv")
       sh("git fetch origin +refs/pull/*/merge:refs/remotes/origin/pr/*")
+      sh("git pull")
       sh("git checkout origin/pr/${env.CHANGE_ID}")
       sh('git merge develop')
       sh('ninja')
+      
      }
    }
  }
