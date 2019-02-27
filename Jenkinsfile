@@ -12,7 +12,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
   if ( env.CHANGE_TARGET == "develop") {
 
-    parallel  "linux":  { 
+    parallel (  "linux":  { 
 
       node("openstudio_ubuntu_1604") { 
         // Setup any env variables here
@@ -108,10 +108,10 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
         } //close directory
 
-      } // close node 
-    } // close windows and end parrell
-  }  //close conditional 
-} //close conditional
+      }  // close node 
+    })  // close windows and end parrell
+  }      //close conditional 
+}       //close conditional
 
 
 
