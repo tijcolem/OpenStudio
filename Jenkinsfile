@@ -14,7 +14,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
     parallel  "linux":  { 
 
-      node("openstudio_ubuntu_1604) { 
+      node("openstudio_ubuntu_1604") { 
         // Setup any env variables here
 
         if (("/srv/jenkins/openstudio/git/develop/build") == "false") { 
