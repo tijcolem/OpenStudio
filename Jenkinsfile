@@ -8,7 +8,6 @@ either buld pull requests as incremental builds vs nightly and on-demand full bu
 remove comment. 
 */
 
-
 // Build for PR and target branch develop
 if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
@@ -16,7 +15,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
     parallel (  "linux":  { 
 
-      node("openstudio_ubuntu_1604") { 
+      node("openstudio_ubuntu_1604_incr") { 
         // Setup any env variables here
 
         if (("/srv/jenkins/openstudio/git/develop/build") == "false") { 
@@ -30,8 +29,6 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
           stage("build openstudio") {
             echo("building openstudio")
 
-          //  sh("rm -rf ./Products") //remove any exisiting artifacts
-            sh("printenv")
             sh("git checkout develop")
             sh("git pull")
             sh("git fetch origin +refs/pull/*/merge:refs/remotes/origin/pr/*")
@@ -43,14 +40,14 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//            try {
-//              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//              sh("ctest -j ${num_of_proc}")
-//               // Intreprest ctest results here and pass/fail
-//              currentBuild.result = "SUCCESS" 
-//            } catch (Exception err) {
-//              currentBuild.result = "SUCCESS" 
-//              currentBuild.result = "FAILURE" // Uncomment when ready
+            try {
+              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
+              sh("ctest -j ${num_of_proc}")
+               // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
 //           }
           }
 
@@ -69,7 +66,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
     "windows": { 
 
-      node("openstudio_windows_server_2019") { 
+      node("openstudio_windows_server_2019-vs2013_incr") { 
         // Setup any env variables here
     
         //switch to build directory for openstudio
@@ -79,25 +76,26 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
             echo("building openstudio")
   
           //  sh("rm -rf ./Products") //remove any exisiting artifacts
-            powershell("gci env:")
+           // powershell("gci env:")
             powershell("git checkout develop")
             powershell("git pull")
             powershell("git fetch origin +refs/pull/*/merge:refs/remotes/origin/pr/*")
             powershell("git checkout origin/pr/${env.CHANGE_ID}")
             powershell('git merge develop')
-           // sh('ninja package') // Ninja uses all avail cores without explict cmds
+            powershell('cmake  merge develop'
+            powershell('cmake --build . --config Release --target PACKAGE') 
+
           }
         
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//          try {
-//            def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//            sh("ctest -j ${num_of_proc}")
-//            //Intreprest ctest results here and pass/fail
-//             currentBuild.result = "SUCCESS" 
-//           } catch (Exception err) {
-//             currentBuild.result = "SUCCESS" 
-//             currentBuild.result = "FAILURE" // Uncomment when ready
+          try {
+            powersheel("ctest -j 16")
+            //Intreprest ctest results here and pass/fail
+             currentBuild.result = "SUCCESS" 
+           } catch (Exception err) {
+             currentBuild.result = "SUCCESS" 
+             currentBuild.result = "FAILURE" // Uncomment when ready
           }
   
           stage("package openstudio") {
