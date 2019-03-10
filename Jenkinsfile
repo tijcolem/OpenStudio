@@ -16,7 +16,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
     parallel (  "linux":  { 
 
-      node("openstudio_ubuntu_1604") { 
+      node("openstudio_ubuntu_1604_incr") { 
         // Setup any env variables here
 
         if (fileExists("/srv/jenkins/openstudio/git/develop/build") == "false") { 
@@ -69,7 +69,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
     "windows": { 
 
-      node("openstudio_windows_server_2019") { 
+      node("openstudio_windows_server_2019-vs2013_incr") { 
         // Setup any env variables here
     
         if (fileExists("D:/jenkins/openstudio/develop/build") == "false") { 
