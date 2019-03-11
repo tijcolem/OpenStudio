@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.7.0)
 cmake_policy(SET CMP0048 NEW)
+cmake_policy(SET CMP0077 OLD)
+
 
 # Use ccache is available, has to be before "project()"
 find_program(CCACHE_PROGRAM ccache)
