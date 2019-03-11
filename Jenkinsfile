@@ -42,7 +42,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
             sh("git fetch origin +refs/pull/*/merge:refs/remotes/origin/pr/*")
             sh("git checkout origin/pr/${env.CHANGE_ID}")
             sh("git merge develop")
-            sh("cmake -DOPENSSL_INCLUDE_DIR=/usr/bin/openssl -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+            sh("cmake -DOPENSSL_INCLUDE_DIR=/usr/bin/openssl -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
             sh("make -j 16 package") // Ninja uses all avail cores without explict cmds
           }
 
@@ -153,7 +153,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
             sh("git fetch origin +refs/pull/*/merge:refs/remotes/origin/pr/*")
             sh("git checkout origin/pr/${env.CHANGE_ID}")
             sh("git merge develop3")
-            sh("cmake -DOPENSSL_INCLUDE_DIR=/usr/bin/openssl -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+            sh("cmake -DOPENSSL_INCLUDE_DIR=/usr/bin/openssl -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
             sh("make -j 16 package") // Ninja uses all avail cores without explict cmds
           }
 
@@ -248,7 +248,7 @@ else {  //
           dir("/home/ubuntu/git")  {
           
             sh("rm -rf ./OpenStudio")
-            sh("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")
+            sh("git clone --single-branch --branch ${env.BRANCH_NAME} https://github.com/NREL/OpenStudio.git OpenStudio")
             sh('pwd')
           
           } 
@@ -259,7 +259,7 @@ else {  //
           }
           dir("/home/ubuntu/git/OpenStudio/build") { 
            
-            sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+            sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
             sh("make -j 72 package") 
           }
         }
@@ -298,7 +298,7 @@ else {  //
           dir("C:/Users/jenkins/git")  {
           
             powershell("rm C:/Users/jenkins/git/OpenStudio -r -fo")
-            powershell("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")          
+            powershell("git clone --single-branch --branch ${env.BRANCH_NAME} https://github.com/NREL/OpenStudio.git OpenStudio")          
           } 
 
           dir("C:/Users/jenkins/git/OpenStudio") { 
@@ -308,7 +308,109 @@ else {  //
           }
 
           dir("C:/Users/jenkins/git/OpenStudio/build") { 
-            powershell("cmake -G \\"Visual Studio 12 2013 Win64\\" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_DOCUMENTATION=ON -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=OFF -DCPACK_BINARY_IFW=ON -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF  ../openstudiocore") 
+            powershell("cmake -G \"Visual Studio 12 2013 Win64\" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_DOCUMENTATION=ON -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=OFF -DCPACK_BINARY_IFW=ON -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF  ../openstudiocore") 
+            powershell("cmake --build . --config Release --target PACKAGE")
+          }
+        }
+
+        stage("ctests openstudio") {
+          
+          dir("C:/Users/jenkins/git/OpenStudio/build") {
+
+            try {
+        
+              sh("ctest -j 72")
+              // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+            }
+          }
+        }
+
+        stage("package openstudio") {
+          // push out to aws repo
+          // sh("date +%R)
+          // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("date +%R")
+        }
+      }
+    }) // end parrell
+  }
+  if(env.BRANCH_NAME == 'develop3') { 
+ 
+    parallel (  "linux":  { 
+   
+      node("openstudio_ubuntu_1804_full") { 
+   
+        stage("build openstudio") {
+          
+          dir("/home/ubuntu/git")  {
+          
+            sh("rm -rf ./OpenStudio")
+            sh("git clone --single-branch --branch ${env.BRANCH_NAME} https://github.com/NREL/OpenStudio.git OpenStudio")
+            sh('pwd')
+          
+          } 
+          dir("/home/ubuntu/git/OpenStudio") { 
+
+            sh("rm -rf ./build")
+            sh("mkdir build")
+          }
+          dir("/home/ubuntu/git/OpenStudio/build") { 
+           
+            sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+            sh("make -j 72 package") 
+          }
+        }
+
+        stage("ctests openstudio") {
+          
+          dir("/home/ubuntu/git/OpenStudio/build") {
+
+            try {
+        
+              sh("ctest -j 72")
+              // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+            }
+          }
+        }
+
+        stage("package openstudio") {
+          // push out to aws repo
+          // sh("date +%R)
+          // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("date +%R")
+        }
+      }
+    }, // next parrell
+ 
+    "windows": { 
+      node("openstudio_windows_server_2019-vs2017_full") { 
+   
+        stage("build openstudio") {
+          
+          dir("C:/Users/jenkins/git")  {
+          
+            powershell("rm C:/Users/jenkins/git/OpenStudio -r -fo")
+            powershell("git clone --single-branch --branch ${env.BRANCH_NAME} https://github.com/NREL/OpenStudio.git OpenStudio")          
+          } 
+
+          dir("C:/Users/jenkins/git/OpenStudio") { 
+
+            powershell("rm C:/Users/jenkins/git/OpenStudio/build -r -fo")
+            powershell("mkdir build")
+          }
+
+          dir("C:/Users/jenkins/git/OpenStudio/build") { 
+            powershell("cmake -G \"Visual Studio 12 2013 Win64\" -DBUILD_CSHARP_BINDINGS=ON -DBUILD_DOCUMENTATION=ON -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=OFF -DCPACK_BINARY_IFW=ON -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF  ../openstudiocore") 
             powershell("cmake --build . --config Release --target PACKAGE")
           }
         }
