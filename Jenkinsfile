@@ -232,7 +232,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
   else { 
  
-    if(env.BRANCH_NAME == 'master') { 
+    if(env.BRANCH_NAME == 'develop') { 
  
       node("openstudio_ubuntu_1604_full") { 
         // Setup any env variables here
@@ -242,7 +242,7 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
         }
 
         //switch to build directory for openstudio
-        dir("/srv/jenkins/openstudio/git)  {
+        dir("/srv/jenkins/openstudio/git")  {
 
             
           stage("build openstudio") {
