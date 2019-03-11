@@ -9,6 +9,9 @@ remove comment.
 */
 
 
+
+
+echo sh(script: 'env', returnStdout: true)
 // Incremental builds for PR and target branch develop
 if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
