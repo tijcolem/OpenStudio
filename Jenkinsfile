@@ -10,8 +10,9 @@ remove comment.
 
 
 
-
-echo sh(script: 'env', returnStdout: true)
+node {
+  echo sh(script: 'env', returnStdout: true)
+}
 // Incremental builds for PR and target branch develop
 if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
@@ -232,75 +233,57 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
       }  // close node 
     })  // close windows and end parrell
   }      //close conditional 
-
-  else { 
+}
+else {  // 
  
-    if(env.BRANCH_NAME == 'develop') { 
+  if(env.BRANCH_NAME == 'develop') { 
  
-      node("openstudio_ubuntu_1604_full") { 
-        // Setup any env variables here
+    node("openstudio_ubuntu_1604_full") { 
+   
+      stage("build openstudio") {
+          
+        dir("/home/ubuntu/git")  {
+          
+          sh("rm -rf ./OpenStudio")
+          sh("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")
+          sh('pwd')
+          
+        } 
+        dir("/home/ubuntu/git/OpenStudio") { 
 
-        if (fileExists("/srv/jenkins/openstudio/git") == "false") { 
-          sh("mkdir -p /srv/jenkins/openstudio/git") 
+          sh("rm -rf ./build")
+          sh("mkdir build")
         }
+        dir("/home/ubuntu/git/OpenStudio/build") { 
+           
+          sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+          sh("make -j 72 package") 
+        }
+      }
 
-        //switch to build directory for openstudio
-        dir("/srv/jenkins/openstudio/git")  {
+      stage("ctests openstudio") {
+          
+        dir("/home/ubuntu/git/OpenStudio/build") {
 
-            
-          stage("build openstudio") {
-            echo("building openstudio")
-
-            sh("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")
-  
-            if (fileExists("/srv/jenkins/openstudio/git/OpenStudio/build") == "false") { 
-              sh("mkdir -p /srv/jenkins/openstudio/git/OpenStudio/build") 
-            }
-            sh("cd OpenStudio/build")
-            sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
-            sh("make -j 72 package") 
-          }
-
-          stage("ctests openstudio") {
-            echo("running ctests for openstudio")
-            try {
+          try {
         
-                sh("ctest -j 72")
-               // Intreprest ctest results here and pass/fail
-              currentBuild.result = "SUCCESS" 
-            } catch (Exception err) {
-              currentBuild.result = "SUCCESS" 
-              currentBuild.result = "FAILURE" // Uncomment when ready
-            }
+            sh("ctest -j 72")
+            // Intreprest ctest results here and pass/fail
+            currentBuild.result = "SUCCESS" 
+          } catch (Exception err) {
+            currentBuild.result = "SUCCESS" 
+            currentBuild.result = "FAILURE" // Uncomment when ready
           }
-
-          stage("package openstudio") {
-            // push out to aws repo
-            // sh("date +%R)
-            // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-            // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-            // sh("date +%R")
-          }
-
         }
-      } // end node
+      }
 
-
-
-
-      
+      stage("package openstudio") {
+        // push out to aws repo
+        // sh("date +%R)
+        // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+        // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+        // sh("date +%R")
+      }
     }
-
-
-  }
-
-
-
-}       //close conditional
-
-
-
-//  node("openstudio-osx-sierra") { 
-//    // Setup any env variables here
-//
-//  }
+  } 
+}
