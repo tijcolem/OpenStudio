@@ -234,105 +234,109 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
       }  // close node 
     })  // close windows and end parrell
   }      //close conditional 
-}
+} 
 else {  // 
  
   if(env.BRANCH_NAME == 'develop') { 
  
-    node("openstudio_ubuntu_1604_full") { 
+    parallel (  "linux":  { 
    
-      stage("build openstudio") {
+      node("openstudio_ubuntu_1604_full") { 
+   
+        stage("build openstudio") {
           
-        dir("/home/ubuntu/git")  {
+          dir("/home/ubuntu/git")  {
           
-          sh("rm -rf ./OpenStudio")
-          sh("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")
-          sh('pwd')
+            sh("rm -rf ./OpenStudio")
+            sh("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")
+            sh('pwd')
           
-        } 
-        dir("/home/ubuntu/git/OpenStudio") { 
+          } 
+          dir("/home/ubuntu/git/OpenStudio") { 
 
-          sh("rm -rf ./build")
-          sh("mkdir build")
-        }
-        dir("/home/ubuntu/git/OpenStudio/build") { 
+            sh("rm -rf ./build")
+            sh("mkdir build")
+          }
+          dir("/home/ubuntu/git/OpenStudio/build") { 
            
-          sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
-          sh("make -j 72 package") 
-        }
-      }
-
-      stage("ctests openstudio") {
-          
-        dir("/home/ubuntu/git/OpenStudio/build") {
-
-          try {
-        
-            sh("ctest -j 72")
-            // Intreprest ctest results here and pass/fail
-            currentBuild.result = "SUCCESS" 
-          } catch (Exception err) {
-            currentBuild.result = "SUCCESS" 
-            currentBuild.result = "FAILURE" // Uncomment when ready
+            sh("cmake -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=ON -            DCPACK_BINARY_IFW=OFF -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF ../openstudiocore")
+            sh("make -j 72 package") 
           }
         }
-      }
 
-      stage("package openstudio") {
-        // push out to aws repo
-        // sh("date +%R)
-        // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-        // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-        // sh("date +%R")
-      }
-    }
+        stage("ctests openstudio") {
+          
+          dir("/home/ubuntu/git/OpenStudio/build") {
 
-    node("openstudio_windows_server_2019-vs2013_full") { 
+            try {
+        
+              sh("ctest -j 72")
+              // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+            }
+          }
+        }
+
+        stage("package openstudio") {
+          // push out to aws repo
+          // sh("date +%R)
+          // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("date +%R")
+        }
+      }
+    }, // next parrell
+ 
+    "windows": { 
+      node("openstudio_windows_server_2019-vs2013_full") { 
    
-      stage("build openstudio") {
+        stage("build openstudio") {
           
-        dir("C:/Users/jenkins/git")  {
+          dir("C:/Users/jenkins/git")  {
           
-          powershell("rm C:/Users/jenkins/git/OpenStudio -r -fo")
-          powershell("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")          
-        } 
+            powershell("rm C:/Users/jenkins/git/OpenStudio -r -fo")
+            powershell("git clone --single-branch --branch develop https://github.com/NREL/OpenStudio.git OpenStudio")          
+          } 
 
-        dir("C:/Users/jenkins/git/OpenStudio") { 
+          dir("C:/Users/jenkins/git/OpenStudio") { 
 
-          powershell("rm C:/Users/jenkins/git/OpenStudio/build -r -fo")
-          powershell("mkdir build")
-        }
+            powershell("rm C:/Users/jenkins/git/OpenStudio/build -r -fo")
+            powershell("mkdir build")
+          }
 
-        dir("C:/Users/jenkins/git/OpenStudio/build") { 
-          powershell("cmake -DBUILD_CSHARP_BINDINGS=ON -DBUILD_DOCUMENTATION=ON -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=OFF -DCPACK_BINARY_IFW=ON -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF  ../openstudiocore") 
-          powershell("cmake --build . --config Release --target PACKAGE")
-        }
-      }
-
-      stage("ctests openstudio") {
-          
-        dir("C:/Users/jenkins/git/OpenStudio/build") {
-
-          try {
-        
-            sh("ctest -j 72")
-            // Intreprest ctest results here and pass/fail
-            currentBuild.result = "SUCCESS" 
-          } catch (Exception err) {
-            currentBuild.result = "SUCCESS" 
-            currentBuild.result = "FAILURE" // Uncomment when ready
+          dir("C:/Users/jenkins/git/OpenStudio/build") { 
+            powershell("cmake -DBUILD_CSHARP_BINDINGS=ON -DBUILD_DOCUMENTATION=ON -DBUILD_TESTING=ON -DBUILD_DVIEW=ON -DBUILD_OS_APP=ON -DBUILD_PACKAGE=ON -DBUILD_PAT=OFF -DCMAKE_BUILD_TYPE=Release -DCPACK_BINARY_DEB=OFF -DCPACK_BINARY_IFW=ON -DCPACK_BINARY_NSIS=OFF -DCPACK_BINARY_RPM=OFF -DCPACK_BINARY_STGZ=OFF -DCPACK_BINARY_TBZ2=OFF -DCPACK_BINARY_TGZ=OFF -DCPACK_BINARY_TXZ=OFF -DCPACK_BINARY_TZ=OFF  ../openstudiocore") 
+            powershell("cmake --build . --config Release --target PACKAGE")
           }
         }
-      }
 
-      stage("package openstudio") {
-        // push out to aws repo
-        // sh("date +%R)
-        // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-        // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
-        // sh("date +%R")
-      }
-    }
+        stage("ctests openstudio") {
+          
+          dir("C:/Users/jenkins/git/OpenStudio/build") {
 
-  } 
+            try {
+        
+              sh("ctest -j 72")
+              // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+            }
+          }
+        }
+
+        stage("package openstudio") {
+          // push out to aws repo
+          // sh("date +%R)
+          // sh("aws s3 cp ./ s3://openstudio-builds/_CI/OpenStudio/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("aws s3 cp ./ s3://openstudio-builds/develop/latest/ --recursive --exclude \"*\" --include \"OpenStudio-2.*-Linux.deb\""")
+          // sh("date +%R")
+        }
+      }
+    }) // end parrell
+  }
 }
