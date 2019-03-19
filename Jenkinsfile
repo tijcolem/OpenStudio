@@ -16,8 +16,8 @@ remove comment.
 
 //use triggers array to store nightly build job times
 
-properties([pipelineTriggers([cron('H/15 * * * *')])])
-def triggers = []
+//properties([pipelineTriggers([cron('H/15 * * * *')])])
+//def triggers = []
 
 
 // Incremental builds for PR and target branch develop
@@ -245,7 +245,7 @@ else {  //
  
   if(env.BRANCH_NAME == 'develop') { 
 
-    triggers << cron('*/2 * * * *')  
+    //triggers << cron('*/2 * * * *')  
     parallel (  "linux":  { 
    
       node("openstudio_ubuntu_1604_full") { 
