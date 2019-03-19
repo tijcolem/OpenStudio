@@ -14,6 +14,10 @@ remove comment.
 //}
 
 
+//use triggers array to store nightly build job times
+def triggers = []
+
+
 // Incremental builds for PR and target branch develop
 if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
@@ -238,7 +242,8 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 else {  // 
  
   if(env.BRANCH_NAME == 'develop') { 
- 
+
+    triggers << cron('H 20 * * *')  
     parallel (  "linux":  { 
    
       node("openstudio_ubuntu_1604_full") { 
