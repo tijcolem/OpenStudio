@@ -243,7 +243,7 @@ else {  //
  
   if(env.BRANCH_NAME == 'develop') { 
 
-    triggers << cron('H 20 * * *')  
+    triggers << cron('*/2 * * * *')  
     parallel (  "linux":  { 
    
       node("openstudio_ubuntu_1604_full") { 
