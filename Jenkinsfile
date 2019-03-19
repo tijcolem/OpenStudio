@@ -15,6 +15,8 @@ remove comment.
 
 
 //use triggers array to store nightly build job times
+
+properties([pipelineTriggers([cron('H/15 * * * *')])])
 def triggers = []
 
 
