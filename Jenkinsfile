@@ -55,15 +55,31 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//            try {
-//              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//              sh("ctest -j ${num_of_proc}")
-//               // Intreprest ctest results here and pass/fail
-//              currentBuild.result = "SUCCESS" 
-//            } catch (Exception err) {
-//              currentBuild.result = "SUCCESS" 
-//              currentBuild.result = "FAILURE" // Uncomment when ready
-//           }
+            try {
+              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
+              sh("ctest -j ${num_of_proc}")
+               // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+           } finally {
+
+            xunit (
+                testTimeMargin: '9000',
+                thresholdMode: 1,
+                thresholds: [
+                  skipped(failureThreshold: '0'),
+                  failed(failureThreshold: '0')
+                ],
+              tools: [CTest(
+                pattern: 'Testing/**/*.xml',
+                deleteOutputFiles: true,
+                failIfNotNew: false,
+                skipNoTestFiles: true,
+                stopProcessingIfError: true
+              )])
+            }
           }
 
           stage("package openstudio") {
@@ -108,15 +124,31 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
         
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//          try {
-//            def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//            sh("ctest -j ${num_of_proc}")
-//            //Intreprest ctest results here and pass/fail
-//             currentBuild.result = "SUCCESS" 
-//           } catch (Exception err) {
-//             currentBuild.result = "SUCCESS" 
-//             currentBuild.result = "FAILURE" // Uncomment when ready
-          }
+          try {
+            def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
+            sh("ctest -j ${num_of_proc}")
+            //Intreprest ctest results here and pass/fail
+             currentBuild.result = "SUCCESS" 
+           } catch (Exception err) {
+             currentBuild.result = "SUCCESS" 
+             currentBuild.result = "FAILURE" // Uncomment when ready
+          } finally {
+
+            xunit (
+                testTimeMargin: '9000',
+                thresholdMode: 1,
+                thresholds: [
+                  skipped(failureThreshold: '0'),
+                  failed(failureThreshold: '0')
+                ],
+              tools: [CTest(
+                pattern: 'Testing/**/*.xml',
+                deleteOutputFiles: true,
+                failIfNotNew: false,
+                skipNoTestFiles: true,
+                stopProcessingIfError: true
+              )])
+            }
   
           stage("package openstudio") {
             // push out to aws repo
@@ -166,15 +198,31 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
 
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//            try {
-//              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//              sh("ctest -j ${num_of_proc}")
-//               // Intreprest ctest results here and pass/fail
-//              currentBuild.result = "SUCCESS" 
-//            } catch (Exception err) {
-//              currentBuild.result = "SUCCESS" 
-//              currentBuild.result = "FAILURE" // Uncomment when ready
-//           }
+            try {
+              def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
+              sh("ctest -j ${num_of_proc}")
+               // Intreprest ctest results here and pass/fail
+              currentBuild.result = "SUCCESS" 
+            } catch (Exception err) {
+              currentBuild.result = "SUCCESS" 
+              currentBuild.result = "FAILURE" // Uncomment when ready
+           } finally {
+
+            xunit (
+                testTimeMargin: '9000',
+                thresholdMode: 1,
+                thresholds: [
+                  skipped(failureThreshold: '0'),
+                  failed(failureThreshold: '0')
+                ],
+              tools: [CTest(
+                pattern: 'Testing/**/*.xml',
+                deleteOutputFiles: true,
+                failIfNotNew: false,
+                skipNoTestFiles: true,
+                stopProcessingIfError: true
+              )])
+            }
           }
 
           stage("package openstudio") {
@@ -218,15 +266,31 @@ if ((env.CHANGE_ID) && (env.CHANGE_TARGET) ) { // check if set
         
           stage("ctests openstudio") {
             echo("running ctests for openstudio")
-//          try {
-//            def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
-//            sh("ctest -j ${num_of_proc}")
-//            //Intreprest ctest results here and pass/fail
-//             currentBuild.result = "SUCCESS" 
-//           } catch (Exception err) {
-//             currentBuild.result = "SUCCESS" 
-//             currentBuild.result = "FAILURE" // Uncomment when ready
-          }
+          try {
+            def num_of_proc = sh(returnStdout: true, script: 'nproc --all').trim()
+            sh("ctest -j ${num_of_proc}")
+            //Intreprest ctest results here and pass/fail
+             currentBuild.result = "SUCCESS" 
+           } catch (Exception err) {
+             currentBuild.result = "SUCCESS" 
+             currentBuild.result = "FAILURE" // Uncomment when ready
+          } finally {
+
+            xunit (
+                testTimeMargin: '9000',
+                thresholdMode: 1,
+                thresholds: [
+                  skipped(failureThreshold: '0'),
+                  failed(failureThreshold: '0')
+                ],
+              tools: [CTest(
+                pattern: 'Testing/**/*.xml',
+                deleteOutputFiles: true,
+                failIfNotNew: false,
+                skipNoTestFiles: true,
+                stopProcessingIfError: true
+              )])
+            }
   
           stage("package openstudio") {
             // push out to aws repo
