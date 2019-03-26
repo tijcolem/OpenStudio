@@ -27,95 +27,53 @@
 *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ***********************************************************************************************************************/
 
-#ifndef MODEL_UTILITYCOST_CHARGE_SIMPLE_HPP
-#define MODEL_UTILITYCOST_CHARGE_SIMPLE_HPP
+#include <gtest/gtest.h>
+#include "EnergyPlusFixture.hpp"
 
-#include "ModelAPI.hpp"
-#include "ParentObject.hpp"
-#include "../utilities/core/Optional.hpp"
+#include "../ForwardTranslator.hpp"
+#include "../../model/Model.hpp"
+#include "../../model/ZoneHVACPackagedTerminalAirConditioner.hpp"
+#include "../../model/ThermalZone.hpp"
+#include "../../model/CoilWaterHeatingDesuperheater.hpp"
+#include "../../model/CoilCoolingDXSingleSpeed.hpp"
+#include "../../model/CoilHeatingElectric.hpp"
+#include "../../model/FanConstantVolume.hpp"
 
-namespace openstudio{
-namespace model{
+#include "../../model/ScheduleConstant.hpp"
 
-namespace detail{
-  class UtilityCost_Charge_Simple_Impl;
+#include <utilities/idd/ZoneHVAC_PackagedTerminalAirConditioner_FieldEnums.hxx>
+#include <utilities/idd/IddEnums.hxx>
+
+using namespace openstudio::energyplus;
+using namespace openstudio::model;
+using namespace openstudio;
+
+TEST_F(EnergyPlusFixture, ForwardTranslator_ZoneHVACPackagedTerminalAirConditioner) {
+
+  Model m;
+
+  Schedule sch = m.alwaysOnDiscreteSchedule();
+  FanConstantVolume fan(m);
+  CoilCoolingDXSingleSpeed cc(m);
+  CoilHeatingElectric hc(m);
+
+  ZoneHVACPackagedTerminalAirConditioner ptac(m, sch, fan, hc, cc);
+
+  // Need to be in a thermal zone to be translated
+  ThermalZone z(m);
+  ptac.addToThermalZone(z);
+
+  ForwardTranslator forwardTranslator;
+  Workspace workspace = forwardTranslator.translateModel(m);
+
+  WorkspaceObjectVector idfObjs(workspace.getObjectsByType(IddObjectType::ZoneHVAC_PackagedTerminalAirConditioner));
+  ASSERT_EQ(1u, idfObjs.size());
+  WorkspaceObject idf_ptac(idfObjs[0]);
+
+  // Check that the DX coil ends up directly onto the object, and NOT a CoilSystem:Cooling:DX wrapper
+  EXPECT_EQ("Coil:Cooling:DX:SingleSpeed", idf_ptac.getString(ZoneHVAC_PackagedTerminalAirConditionerFields::CoolingCoilObjectType).get());
+  EXPECT_EQ(cc.nameString(), idf_ptac.getString(ZoneHVAC_PackagedTerminalAirConditionerFields::CoolingCoilName).get());
+
+  EXPECT_EQ(0u, workspace.getObjectsByType(IddObjectType::CoilSystem_Cooling_DX).size());
+
 }
-
-/** UtilityCost_Charge_Simple derives from ParentObject and is an interface to the OpenStudio IDD object named "OS:UtilityCost:Charge:Simple".
- *
- *  UtilityCost_Charge_Simple is used to compute flat charges such as taxes and fees related to a utility bill.
- */
-class MODEL_API UtilityCost_Charge_Simple : public ParentObject{
-
-public:
-
-  /** @name Constructors and Destructors */
-  //@{
-
-  /// Constructs a new UtilityCost_Charge_Simple object in the model.
-  explicit UtilityCost_Charge_Simple(const Model& model);
-
-  virtual ~UtilityCost_Charge_Simple() {}
-
-  //@}
-  /** @name Getters */
-  //@{
-
-  boost::optional<std::string> tariffName() const;
-
-  boost::optional<std::string> sourceVariable() const;
-
-  boost::optional<std::string> season() const;
-
-  boost::optional<std::string> categoryVariableName() const;
-
-  boost::optional<std::string> costPerUnitValueOrVariableName() const;
-
-  //@}
-  /** @name Setters */
-  //@{
-
-  bool setTariffName(const std::string& tariffName);
-
-  bool setSourceVariable(const std::string& sourceVariable);
-
-  bool setSeason(const std::string& season);
-
-  bool setCategoryVariableName(const std::string& categoryVariableName);
-
-  bool setCostPerUnitValueOrVariableName(const std::string& costPerUnitValueOrVariableName);
-
-  //@}
-
-  /// Returns the IddObjectType.
-  static IddObjectType iddObjectType();
-
-protected:
-
-  /// @cond
-
-  typedef detail::UtilityCost_Charge_Simple_Impl ImplType;
-
-  friend class Model;
-  friend class IdfObject;
-
-  // constructor
-  explicit UtilityCost_Charge_Simple(std::shared_ptr<detail::UtilityCost_Charge_Simple_Impl> impl);
-
-private:
-  REGISTER_LOGGER("openstudio.model.UtilityCost_Charge_Simple");
-
-  /// @endcond
-
-};
-
-/** \relates UtilityCost_Charge_Simple */
-typedef boost::optional<UtilityCost_Charge_Simple> OptionalUtilityCost_Charge_Simple;
-
-/** \relates UtilityCost_Charge_Simple */
-typedef std::vector<UtilityCost_Charge_Simple> UtilityCost_Charge_SimpleVector;
-
-} // model
-} // openstudio
-
-#endif // MODEL_UTILITYCOST_CHARGE_SIMPLE_HPP

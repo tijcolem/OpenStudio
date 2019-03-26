@@ -72,11 +72,11 @@ set(ENERGYPLUS_VERSION_MINOR 1)
 set(ENERGYPLUS_VERSION_PATCH 0)
 set(ENERGYPLUS_VERSION "${ENERGYPLUS_VERSION_MAJOR}.${ENERGYPLUS_VERSION_MINOR}.${ENERGYPLUS_VERSION_PATCH}")
 # Build SHA is not required to have a value, but if it does OpenStudio will require this build.
-set(ENERGYPLUS_BUILD_SHA "d830726d9e")
+set(ENERGYPLUS_BUILD_SHA "61912d3695")
 
 # ENERGYPLUS_RELEASE_NAME is used to locate the E+ download
 # from the github releases
-set(ENERGYPLUS_RELEASE_NAME "v9.1.0-IOFreeze")
+set(ENERGYPLUS_RELEASE_NAME "v9.1.0-RC1")
 
 # Radiance
 set(RADIANCE_VERSION "5.0.a.12")
@@ -383,14 +383,14 @@ endif()
 
 if(UNIX)
   if(APPLE)
-    set(ENERGYPLUS_EXPECTED_HASH e88d0ad1078c9ee7b176a9e9fbcaf4b0)
+    set(ENERGYPLUS_EXPECTED_HASH dd564aa6fa5a61fa474468697455d288)
     set(ENERGYPLUS_PLATFORM "Darwin-x86_64")
   elseif(EXISTS "/etc/redhat-release")
     # TODO: There aren't any redhat releases anymore, see PR #3145 too
     set(ENERGYPLUS_EXPECTED_HASH 42b2fe2ef5df1d4cfef2160e46529a2f)
     set(ENERGYPLUS_PLATFORM "Redhat-x86_64")
   else()
-    set(ENERGYPLUS_EXPECTED_HASH 00c6e9ca936927efe719e2c0244ac56b)
+    set(ENERGYPLUS_EXPECTED_HASH 86a5854985e80d9627d0f07bd38e90fd)
     set(ENERGYPLUS_PLATFORM "Linux-x86_64")
   endif()
   set(ENERGYPLUS_PATH "EnergyPlus-${ENERGYPLUS_VERSION}-${ENERGYPLUS_BUILD_SHA}-${ENERGYPLUS_PLATFORM}")
@@ -403,14 +403,15 @@ if(UNIX)
     unset(ENERGYPLUS_EXE CACHE)
     unset(ENERGYPLUS_IDD CACHE)
     unset(ENERGYPLUS_WEATHER_DIR CACHE)
-  if(EXISTS "/etc/redhat-release")
-    file(DOWNLOAD "http://openstudio-resources.s3.amazonaws.com/dependencies/${ENERGYPLUS_PATH}.tar.gz" "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}.tar.gz" INACTIVITY_TIMEOUT 320 SHOW_PROGRESS EXPECTED_MD5 ${ENERGYPLUS_EXPECTED_HASH})
-  else()
-    file(DOWNLOAD "https://github.com/NREL/EnergyPlus/releases/download/${ENERGYPLUS_RELEASE_NAME}/${ENERGYPLUS_PATH}.tar.gz" "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}.tar.gz" INACTIVITY_TIMEOUT 320 SHOW_PROGRESS EXPECTED_MD5 ${ENERGYPLUS_EXPECTED_HASH})
-  endif()
+    if(EXISTS "/etc/redhat-release")
+      file(DOWNLOAD "http://openstudio-resources.s3.amazonaws.com/dependencies/${ENERGYPLUS_PATH}.tar.gz" "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}.tar.gz" INACTIVITY_TIMEOUT 320 SHOW_PROGRESS EXPECTED_MD5 ${ENERGYPLUS_EXPECTED_HASH})
+    else()
+      file(DOWNLOAD "https://github.com/NREL/EnergyPlus/releases/download/${ENERGYPLUS_RELEASE_NAME}/${ENERGYPLUS_PATH}.tar.gz" "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}.tar.gz" INACTIVITY_TIMEOUT 320 SHOW_PROGRESS EXPECTED_MD5 ${ENERGYPLUS_EXPECTED_HASH})
+    endif()
     execute_process(COMMAND ${CMAKE_COMMAND} -E remove_directory "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}")
     execute_process(COMMAND ${CMAKE_COMMAND} -E tar xfz "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}.tar.gz" WORKING_DIRECTORY "${CMAKE_BINARY_DIR}")
   endif()
+
   # Prior to E+ 9.1.0 (OS 2.7.2), zip/tar.gz would extract to something like `./EnergyPlus-9.0.0-buildsha-Linux-x86_64/EnergyPlus-9-0-0`
   if (ENERGYPLUS_VERSION VERSION_LESS "9.1.0")
     set(ENV{ENERGYPLUSDIR} "${CMAKE_BINARY_DIR}/${ENERGYPLUS_PATH}/EnergyPlus-${ENERGYPLUS_VERSION_MAJOR}-${ENERGYPLUS_VERSION_MINOR}-${ENERGYPLUS_VERSION_PATCH}")
@@ -423,7 +424,7 @@ elseif(WIN32)
   if(CMAKE_CL_64)
     set(ENERGYPLUS_PATH "EnergyPlus-${ENERGYPLUS_VERSION}-${ENERGYPLUS_BUILD_SHA}-Windows-x86_64")
     set(ENERGYPLUS_ARCH 64)
-    set(ENERGYPLUS_EXPECTED_HASH 11926295eddb3d7b6d5bcd851a1a0849)
+    set(ENERGYPLUS_EXPECTED_HASH 504ade54474b5172116c8011ff5a5c46)
   else()
     set(ENERGYPLUS_PATH "EnergyPlus-${ENERGYPLUS_VERSION}-${ENERGYPLUS_BUILD_SHA}-Windows-i386")
     set(ENERGYPLUS_ARCH 32)
@@ -606,8 +607,8 @@ endif()
 
 # build and release openstudio gems at https://github.com/NREL/OpenStudio-gems
 # upload the openstudio-gems-DATE.tar.gz to the dependencies location on s3, then update the MD5sum and url below
-set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio-gems-20190307.tar.gz")
-set(OPENSTUDIO_GEMS_ZIP_EXPECTED_MD5 "1a00d0ee45731c0cce4ca7b73a438005")
+set(OPENSTUDIO_GEMS_ZIP_FILENAME "openstudio-gems-20190321.tar.gz")
+set(OPENSTUDIO_GEMS_ZIP_EXPECTED_MD5 "e600f9cd8f3673c7f6bff3d1bee8565e")
 
 set(OPENSTUDIO_GEMS_ZIP_LOCAL_PATH "${CMAKE_BINARY_DIR}/${OPENSTUDIO_GEMS_ZIP_FILENAME}")
 if(EXISTS "${OPENSTUDIO_GEMS_ZIP_LOCAL_PATH}")
@@ -952,8 +953,8 @@ if(NOT EXISTS ${QT_INSTALL_DIR})
       set(QT_ZIP_EXPECTED_MD5 "25abd383e7db2dfd971b4a4ef145002b")
     endif()
   elseif( APPLE )
-      set(QT_ZIP_FILENAME "qt_5_6_osx_shared.tar.gz")
-      set(QT_ZIP_EXPECTED_MD5 "326887393d55b5da97a1be9764fb0d1b")
+      set(QT_ZIP_FILENAME "qt_5_6_1_osx_shared_openssl_linked_1.0.2q.tar.gz")
+      set(QT_ZIP_EXPECTED_MD5 "27adab1b7517a9544acd5f69cbee3928")
   elseif(EXISTS "/etc/redhat-release")
     set(QT_ZIP_FILENAME "qt_5_6_redhat_shared.tar.gz")
     set(QT_ZIP_EXPECTED_MD5 "12576637037b8d5428e2d63a5e298131")
@@ -1085,8 +1086,8 @@ if( WIN32 )
     set(QT_STATIC_ZIP_EXPECTED_MD5 "d03d2fae40cba06f8b4887c8dce64a07")
   endif()
 elseif( APPLE )
-  set(QT_STATIC_ZIP_FILENAME "qt_5_6_osx_static.tar.gz")
-  set(QT_STATIC_ZIP_EXPECTED_MD5 "d24756746d2fe07212070f675871cf93")
+  set(QT_STATIC_ZIP_FILENAME "qt_5_6_1_osx_static_openssl_linked_1.0.2q.tar.gz")
+  set(QT_STATIC_ZIP_EXPECTED_MD5 "3fd24225db9a26cef48cca8d87859d0f")
 elseif(EXISTS "/etc/redhat-release")
   set(QT_STATIC_ZIP_FILENAME "qt_5_6_redhat_64_static.tar.gz")
   set(QT_STATIC_ZIP_EXPECTED_MD5 "52159660cbdd95a41ab84a2c43140f11")
@@ -1805,12 +1806,12 @@ if(BUILD_CSHARP_BINDINGS)
 endif()
 
 if(BUILD_OS_APP)
-  
+
   cpack_add_component(Resources
     DISPLAY_NAME "Application Resources"
     DESCRIPTION "Resource Files used by the OpenStudio Application and SketchUp Plugin"
   )
-  
+
   cpack_add_component(SketchUpPlugin
     DISPLAY_NAME "SketchUp Plugin"
     DESCRIPTION "SketchUp Plugin"
@@ -1824,13 +1825,13 @@ if(BUILD_OS_APP)
   cpack_ifw_configure_component(Resources
     REQUIRES_ADMIN_RIGHTS
   )
-  
+
   cpack_ifw_configure_component(SketchUpPlugin
     DEPENDS Resources
     SCRIPT sketchup_plugin/install_operations.qs
     REQUIRES_ADMIN_RIGHTS
   )
-  
+
   cpack_ifw_configure_component(OpenStudioApp
     DEPENDS Resources CLI
     SCRIPT src/openstudio_app/install_operations.qs

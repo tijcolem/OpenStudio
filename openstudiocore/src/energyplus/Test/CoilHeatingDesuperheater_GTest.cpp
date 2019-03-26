@@ -27,68 +27,53 @@
 *  ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 ***********************************************************************************************************************/
 
-#ifndef MODEL_UTILITYCOST_COMPUTATION_IMPL_HPP
-#define MODEL_UTILITYCOST_COMPUTATION_IMPL_HPP
+#include <gtest/gtest.h>
+#include "EnergyPlusFixture.hpp"
 
-#include "ParentObject_Impl.hpp"
-#include "UtilityCost_Computation.hpp"
-#include "../utilities/core/Optional.hpp"
+#include "../ForwardTranslator.hpp"
 
-namespace openstudio {
-namespace model {
-namespace detail {
+#include "../../model/Model.hpp"
+#include "../../model/CoilHeatingDesuperheater.hpp"
+#include "../../model/CoilCoolingDXSingleSpeed.hpp"
+#include "../../model/CoilCoolingDXTwoSpeed.hpp"
+#include "../../model/CoilCoolingDXTwoStageWithHumidityControlMode.hpp"
 
-class MODEL_API UtilityCost_Computation_Impl : public ParentObject_Impl{
+#include <utilities/idd/Coil_Heating_Desuperheater_FieldEnums.hxx>
+#include <utilities/idd/IddEnums.hxx>
 
-public:
-  // constructor
-  UtilityCost_Computation_Impl(const IdfObject& idfObject, Model_Impl* model, bool keepHandle);
+using namespace openstudio::energyplus;
+using namespace openstudio::model;
+using namespace openstudio;
 
-  // construct from workspace
-  UtilityCost_Computation_Impl(const openstudio::detail::WorkspaceObject_Impl& other,
-                 Model_Impl* model,
-                 bool keepHandle);
+TEST_F(EnergyPlusFixture, ForwardTranslator_CoilHeatingDesuperheater) {
+  Model m;
 
-  // clone copy constructor
-  UtilityCost_Computation_Impl(const UtilityCost_Computation_Impl& other,Model_Impl* model,bool keepHandle);
+  CoilHeatingDesuperheater desuperheater(m);
 
-  // virtual destructor
-  virtual ~UtilityCost_Computation_Impl(){}
+  std::vector<HVACComponent> testCoils = {
+    CoilCoolingDXSingleSpeed(m),
+    CoilCoolingDXTwoSpeed(m),
+    CoilCoolingDXTwoStageWithHumidityControlMode(m)
+  };
 
-  OptionalString tariffName() const;
-  bool setTariffName(const std::string& str);
+  ForwardTranslator forwardTranslator;
 
-  /** Compute step index. Index starts at 0. */
-  boost::optional<std::string> computeStep(unsigned index) const;
-  bool setComputeStep(unsigned index, const std::string& str);
+  for (const auto& dxCoil: testCoils) {
 
-  // return the parent object in the hierarchy
-  virtual boost::optional<ParentObject> parent() const override;
+    desuperheater.setHeatingSource(dxCoil);
 
-  // set the parent, child may have to call methods on the parent
-  virtual bool setParent(ParentObject& newParent) override;
+    Workspace workspace = forwardTranslator.translateModel(m);
 
-  // return any children objects in the hierarchy
-  virtual std::vector<ModelObject> children() const override;
+    WorkspaceObjectVector idfObjs(workspace.getObjectsByType(IddObjectType::Coil_Heating_Desuperheater));
+    ASSERT_EQ(1u, idfObjs.size());
+    WorkspaceObject idf_desuperheater(idfObjs[0]);
 
-  /// get a vector of allowable children types
-  virtual std::vector<IddObjectType> allowableChildTypes() const override;
+    std::string ep_idd_name = dxCoil.iddObject().name().substr(3);
 
-  // Get all output variable names that could be associated with this object.
-  virtual const std::vector<std::string>& outputVariableNames() const override;
+    // Check that the DX coil ends up directly onto the object, and NOT a CoilSystem:Cooling:DX wrapper
+    EXPECT_EQ(ep_idd_name, idf_desuperheater.getString(Coil_Heating_DesuperheaterFields::HeatingSourceObjectType).get());
+    EXPECT_EQ(dxCoil.nameString(), idf_desuperheater.getString(Coil_Heating_DesuperheaterFields::HeatingSourceName).get());
 
-  virtual IddObjectType iddObjectType() const override {return UtilityCost_Computation::iddObjectType();}
+  }
 
-  unsigned numComputeSteps() const;
-  unsigned maxComputeSteps() const;
-
-private:
-  REGISTER_LOGGER("openstudio.model.UtilityCost_Computation");
-
-};
-
-} // detail
-} // model
-} // openstudio
-
-#endif // MODEL_UTILITYCOST_COMPUTATION_IMPL_HPP
+}
