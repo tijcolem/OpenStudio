@@ -1441,27 +1441,30 @@ set(${target_name}_src
   UtilityBill.hpp
   UtilityBill_Impl.hpp
   UtilityBill.cpp
-  UtilityCost_Charge_Block.hpp
-  UtilityCost_Charge_Block_Impl.hpp
-  UtilityCost_Charge_Block.cpp
-  UtilityCost_Charge_Simple.hpp
-  UtilityCost_Charge_Simple_Impl.hpp
-  UtilityCost_Charge_Simple.cpp
-  UtilityCost_Computation.hpp
-  UtilityCost_Computation_Impl.hpp
-  UtilityCost_Computation.cpp
-  UtilityCost_Qualify.hpp
-  UtilityCost_Qualify_Impl.hpp
-  UtilityCost_Qualify.cpp
-  UtilityCost_Ratchet.hpp
-  UtilityCost_Ratchet_Impl.hpp
-  UtilityCost_Ratchet.cpp
-  UtilityCost_Tariff.hpp
-  UtilityCost_Tariff_Impl.hpp
-  UtilityCost_Tariff.cpp
-  UtilityCost_Variable.hpp
-  UtilityCost_Variable_Impl.hpp
-  UtilityCost_Variable.cpp
+
+  # TODO: once UtilityCost objects are wrapped
+  # UtilityCost_Charge_Block.hpp
+  # UtilityCost_Charge_Block_Impl.hpp
+  # UtilityCost_Charge_Block.cpp
+  # UtilityCost_Charge_Simple.hpp
+  # UtilityCost_Charge_Simple_Impl.hpp
+  # UtilityCost_Charge_Simple.cpp
+  # UtilityCost_Computation.hpp
+  # UtilityCost_Computation_Impl.hpp
+  # UtilityCost_Computation.cpp
+  # UtilityCost_Qualify.hpp
+  # UtilityCost_Qualify_Impl.hpp
+  # UtilityCost_Qualify.cpp
+  # UtilityCost_Ratchet.hpp
+  # UtilityCost_Ratchet_Impl.hpp
+  # UtilityCost_Ratchet.cpp
+  # UtilityCost_Tariff.hpp
+  # UtilityCost_Tariff_Impl.hpp
+  # UtilityCost_Tariff.cpp
+  # UtilityCost_Variable.hpp
+  # UtilityCost_Variable_Impl.hpp
+  # UtilityCost_Variable.cpp
+
   WaterHeaterMixed.hpp
   WaterHeaterMixed_Impl.hpp
   WaterHeaterMixed.cpp
@@ -2077,7 +2080,7 @@ list(APPEND OpenStudioModelSwigs OpenStudioModelAvailabilityManager)
 MAKE_SWIG_TARGET(OpenStudioModelPlantEquipmentOperationScheme model "${CMAKE_CURRENT_SOURCE_DIR}/ModelPlantEquipmentOperationScheme.i" "${${target_name}_swig_src}" ${swig_target_name} OpenStudioModelHVAC)
 list(APPEND OpenStudioModelSwigs OpenStudioModelPlantEquipmentOperationScheme)
 
-MAKE_SWIG_TARGET(OpenStudioModelStraightComponent model "${CMAKE_CURRENT_SOURCE_DIR}/ModelStraightComponent.i" "${${target_name}_swig_src}" ${swig_target_name} OpenStudioModelHVAC)
+MAKE_SWIG_TARGET(OpenStudioModelStraightComponent model "${CMAKE_CURRENT_SOURCE_DIR}/ModelStraightComponent.i" "${${target_name}_swig_src}" ${swig_target_name} OpenStudioModelZoneHVAC)
 list(APPEND OpenStudioModelSwigs OpenStudioModelStraightComponent)
 
 MAKE_SWIG_TARGET(OpenStudioModelAirflow model "${CMAKE_CURRENT_SOURCE_DIR}/ModelAirflow.i" "${${target_name}_swig_src}" ${swig_target_name} OpenStudioModelHVAC)
